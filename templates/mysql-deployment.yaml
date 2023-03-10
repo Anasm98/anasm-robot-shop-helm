@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    service: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mysql
+  template:
+    metadata:
+      labels:
+        service: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: robotshop/rs-mysql:latest
+        # imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 3306
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 200m
+            memory: 700Mi
+        livenessProbe:
+          periodSeconds: 5
+          httpGet:
+            path: /health
+            port: 3306
+      restartPolicy: Always
